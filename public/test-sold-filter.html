@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sold Items Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        .material-item {
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .sold {
+            background: #ffebee;
+            border-color: #ffcdd2;
+        }
+        select {
+            padding: 8px;
+            margin: 0 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .stats {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Sold Items Filter</h1>
+    
+    <div class="filter-section">
+        <label>Seller ID: 
+            <input type="text" id="sellerId" value="aa1cf6da-00aa-4a0b-b4c5-275be92c87c5" style="width: 300px;">
+        </label>
+        
+        <label>Listing Type Filter:
+            <select id="listingTypeFilter">
+                <option value="all">All Listings</option>
+                <option value="resale">For Resale</option>
+                <option value="internal_transfer">Internal Transfer</option>
+                <option value="sold">Sold</option>
+            </select>
+        </label>
+        
+        <button onclick="loadMaterials()">Load Materials</button>
+    </div>
+    
+    <div class="stats" id="stats"></div>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function loadMaterials() {
+            const sellerId = document.getElementById('sellerId').value;
+            const listingType = document.getElementById('listingTypeFilter').value;
+            
+            let url = `/api/seller/${sellerId}/materials`;
+            if (listingType !== 'all') {
+                url += `?listingType=${listingType}`;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const materials = await response.json();
+                
+                // Display stats
+                const statsDiv = document.getElementById('stats');
+                const soldCount = materials.filter(m => m.listingType === 'sold').length;
+                const resaleCount = materials.filter(m => m.listingType === 'resale').length;
+                
+                statsDiv.innerHTML = `
+                    <h3>Statistics:</h3>
+                    <p>Total Materials: ${materials.length}</p>
+                    <p>For Resale: ${resaleCount}</p>
+                    <p>Sold: ${soldCount}</p>
+                    <p>Filter Applied: ${listingType}</p>
+                `;
+                
+                // Display materials
+                const resultsDiv = document.getElementById('results');
+                if (materials.length === 0) {
+                    resultsDiv.innerHTML = '<p>No materials found with the selected filter.</p>';
+                } else {
+                    resultsDiv.innerHTML = materials.map(material => `
+                        <div class="material-item ${material.listingType === 'sold' ? 'sold' : ''}">
+                            <strong>${material.material}</strong> - 
+                            Quantity: ${material.qty || 0} | 
+                            Listing Type: <strong>${material.listingType}</strong> | 
+                            Price: ₹${material.priceToday || 0} |
+                            ID: ${material.id}
+                        </div>
+                    `).join('');
+                }
+                
+                console.log('Loaded materials:', materials);
+            } catch (error) {
+                console.error('Error loading materials:', error);
+                document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Load on page load
+        loadMaterials();
+    </script>
+</body>
+</html>

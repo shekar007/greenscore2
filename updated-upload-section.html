@@ -1,0 +1,77 @@
+                <!-- Multi-Format Upload Tab -->
+                <div id="upload-tab" class="tab-content active">
+                    <div class="upload-section">
+                        <h2>📁 Smart Bulk Upload</h2>
+                        <p>Upload your inventory from CSV, Excel, or PDF files. Our intelligent system automatically detects and extracts relevant data!</p>
+                        
+                        <div class="csv-requirements">
+                            <h4><i class="fas fa-magic"></i> Intelligent File Processing</h4>
+                            <p>✨ <strong>Supports multiple formats:</strong> CSV, Excel (.xlsx/.xls), and PDF files</p>
+                            <p>🧠 <strong>Smart column detection:</strong> Works with any column names and layouts</p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                                <div style="text-align: center; padding: 1rem; background: #f0f9ff; border-radius: 0.5rem;">
+                                    <i class="fas fa-file-csv" style="font-size: 2rem; color: #0ea5e9; margin-bottom: 0.5rem;"></i>
+                                    <h5>CSV Files</h5>
+                                    <small>Comma-separated values</small>
+                                </div>
+                                <div style="text-align: center; padding: 1rem; background: #f0fdf4; border-radius: 0.5rem;">
+                                    <i class="fas fa-file-excel" style="font-size: 2rem; color: #22c55e; margin-bottom: 0.5rem;"></i>
+                                    <h5>Excel Files</h5>
+                                    <small>.xlsx and .xls formats</small>
+                                </div>
+                                <div style="text-align: center; padding: 1rem; background: #fef2f2; border-radius: 0.5rem;">
+                                    <i class="fas fa-file-pdf" style="font-size: 2rem; color: #ef4444; margin-bottom: 0.5rem;"></i>
+                                    <h5>PDF Files</h5>
+                                    <small>Extracts table data</small>
+                                </div>
+                            </div>
+                            
+                            <ul class="requirements-list">
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Material Name</strong> - Required (material, item, product, name, description)</li>
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Quantity</strong> - Required (qty, quantity, amount, count, stock)</li>
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Price</strong> - Required (price today, current price, selling price, price, cost)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Unit</strong> - Optional (unit, units, measurement, uom)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Brand</strong> - Optional (brand, manufacturer, make)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Condition</strong> - Optional (condition, state, quality)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Specifications</strong> - Optional (specs, specifications, details)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Photos</strong> - Optional (photo, image, picture, url)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Dimensions</strong> - Optional (dimensions, size, measurements)</li>
+                            </ul>
+                            
+                            <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem;">
+                                <p><strong>💡 Pro Tips:</strong></p>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    <li>Column names are flexible - use any variation</li>
+                                    <li>Missing optional columns get smart defaults</li>
+                                    <li>Invalid rows are reported for easy correction</li>
+                                    <li>Maximum file size: 50MB</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h3>Drop your file here</h3>
+                                <p>Supports CSV, Excel (.xlsx/.xls), and PDF files</p>
+                                <p>or <span class="upload-link">click to browse</span></p>
+                                <input type="file" id="csv-file" accept=".csv,.xlsx,.xls,.pdf" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="upload-actions">
+                            <button class="btn btn-primary" id="upload-btn" disabled>
+                                <i class="fas fa-upload"></i>
+                                Upload File
+                            </button>
+                        </div>
+
+                        <div id="upload-progress" class="upload-progress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <p>🔄 Processing your file... This may take a moment for large files.</p>
+                        </div>
+                    </div>
+                </div>

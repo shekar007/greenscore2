@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - GreenScore</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-group { margin: 20px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { padding: 10px; width: 300px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #3b82f6; color: white; border: none; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 5px; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .success { background: #f0fdf4; color: #16a34a; }
+    </style>
+</head>
+<body>
+    <h1>Login Test</h1>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="admin@greenscore.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" value="admin123" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="userType">User Type:</label>
+            <select id="userType" required>
+                <option value="admin" selected>Admin</option>
+                <option value="seller">Seller</option>
+                <option value="buyer">Buyer</option>
+            </select>
+        </div>
+        
+        <button type="submit">Test Login</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, userType })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>Login Successful!</h3>
+                        <p><strong>User ID:</strong> ${result.user.id}</p>
+                        <p><strong>Email:</strong> ${result.user.email}</p>
+                        <p><strong>User Type:</strong> ${result.user.userType}</p>
+                        <p><strong>Name:</strong> ${result.user.name}</p>
+                        <p><strong>Company:</strong> ${result.user.companyName}</p>
+                        <br>
+                        <p><a href="/admin" target="_blank">Go to Admin Panel</a></p>
+                    `;
+                    
+                    // Store user in localStorage
+                    localStorage.setItem('greenscore-user', JSON.stringify(result.user));
+                    console.log('User stored in localStorage:', result.user);
+                    
+                    // Test reading it back
+                    const storedUser = localStorage.getItem('greenscore-user');
+                    console.log('User read from localStorage:', JSON.parse(storedUser));
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<h3>Login Failed</h3><p>${result.message}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<h3>Error</h3><p>${error.message}</p>`;
+                console.error('Login error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

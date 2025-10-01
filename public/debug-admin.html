@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin - GreenScore</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .debug-info { background: #f0f9ff; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .success { background: #f0fdf4; color: #16a34a; }
+        button { padding: 10px 20px; background: #3b82f6; color: white; border: none; cursor: pointer; margin: 10px 5px; }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>Debug Admin Access</h1>
+    
+    <div id="debugInfo" class="debug-info">
+        <h3>Debug Information:</h3>
+        <div id="debugContent">Loading...</div>
+    </div>
+    
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="checkStorage()">Check Storage</button>
+    <button onclick="goToAdmin()">Go to Admin</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    
+    <script>
+        function updateDebugInfo() {
+            const debugContent = document.getElementById('debugContent');
+            const currentUser = getCurrentUser();
+            
+            debugContent.innerHTML = `
+                <p><strong>Current User:</strong> ${currentUser ? JSON.stringify(currentUser, null, 2) : 'None'}</p>
+                <p><strong>User Type:</strong> ${currentUser ? currentUser.userType : 'None'}</p>
+                <p><strong>Is Admin:</strong> ${currentUser && currentUser.userType === 'admin' ? 'Yes' : 'No'}</p>
+                <p><strong>LocalStorage Keys:</strong> ${Object.keys(localStorage).join(', ')}</p>
+            `;
+        }
+        
+        function getCurrentUser() {
+            const userStr = localStorage.getItem('greenscore-user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'admin@greenscore.com', 
+                        password: 'admin123', 
+                        userType: 'admin' 
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    localStorage.setItem('greenscore-user', JSON.stringify(result.user));
+                    updateDebugInfo();
+                    alert('Login successful! User stored in localStorage.');
+                } else {
+                    alert('Login failed: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        function checkStorage() {
+            updateDebugInfo();
+        }
+        
+        function goToAdmin() {
+            window.location.href = '/admin';
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            updateDebugInfo();
+            alert('Storage cleared!');
+        }
+        
+        // Initialize
+        updateDebugInfo();
+    </script>
+</body>
+</html>
+

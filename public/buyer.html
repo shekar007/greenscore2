@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Marketplace - GreenScore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo">
+                    <a href="/">
+                        <i class="fas fa-leaf"></i>
+                        <span>GreenScore</span>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="#marketplace">Marketplace</a>
+                    <a href="#cart" onclick="toggleCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        Cart (<span id="cart-count">0</span>)
+                    </a>
+                    <a href="/seller" class="mode-switch">
+                        <i class="fas fa-store"></i>
+                        Switch to Seller
+                    </a>
+                    <a href="#" onclick="toggleNotifications()" class="notification-btn" title="Notifications" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span id="notification-badge" class="notification-badge" style="display: none; position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px;">0</span>
+                    </a>
+                    <a href="#" onclick="manualRefresh()" class="refresh-btn" title="Refresh marketplace">
+                        <i class="fas fa-sync"></i>
+                        Refresh
+                    </a>
+                    <a href="#" onclick="signOut()" class="sign-out-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notifications Dropdown -->
+    <div id="notifications-dropdown" class="notifications-dropdown" style="display: none; position: fixed; top: 60px; right: 20px; width: 380px; max-height: 500px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden;">
+        <div style="padding: 15px; border-bottom: 1px solid #e5e7eb; background: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <h3 style="margin: 0; color: white; font-size: 16px;">
+                <i class="fas fa-bell"></i> Notifications
+            </h3>
+        </div>
+        <div id="notifications-list" style="max-height: 400px; overflow-y: auto;">
+            <div style="padding: 40px; text-align: center; color: #6b7280;">
+                <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 10px; opacity: 0.3;"></i>
+                <p>No notifications yet</p>
+            </div>
+        </div>
+        <div style="padding: 10px; border-top: 1px solid #e5e7eb; text-align: center;">
+            <button onclick="clearAllNotifications()" style="background: none; border: none; color: #6b7280; cursor: pointer; font-size: 14px;">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+        </div>
+    </div>
+
+    <main class="buyer-main">
+        <div class="container">
+            <div class="buyer-header">
+                <h1><i class="fas fa-shopping-cart"></i> Construction Materials Marketplace</h1>
+                <p id="buyer-welcome">Find quality surplus construction materials at competitive prices</p>
+            </div>
+
+            <div class="marketplace-controls">
+                <div class="search-section">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search materials, brands, specifications...">
+                    </div>
+                    <div class="filters">
+                        <select id="category-filter">
+                            <option value="all">All Categories</option>
+                        </select>
+                        <select id="condition-filter">
+                            <option value="all">All Conditions</option>
+                            <option value="new">New</option>
+                            <option value="like-new">Like New</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                        </select>
+                        <select id="sort-filter">
+                            <option value="newest">Newest First</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="marketplace-content">
+                <div class="category-sidebar">
+                    <h3>Categories</h3>
+                    <div class="category-list" id="category-list">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="products-section">
+                    <div class="products-header">
+                        <h2 id="products-title">All Materials</h2>
+                        <span id="products-count">0 items found</span>
+                    </div>
+
+                    <div class="products-grid" id="products-grid">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading materials...</p>
+                        </div>
+                    </div>
+
+                    <div class="no-products" id="no-products" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <h3>No materials found</h3>
+                        <p>Try adjusting your search criteria or browse different categories.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-cart"></i> Shopping Cart</h3>
+            <button class="cart-close" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-content">
+            <div id="cart-items" class="cart-items">
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <small>Add some materials to get started</small>
+                </div>
+            </div>
+            
+            <div class="cart-footer">
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Platform Fee (3%):</span>
+                        <span id="cart-platform-fee">₹0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="cart-total">₹0.00</span>
+                    </div>
+                </div>
+                
+                <div class="cart-actions">
+                    <button class="btn btn-secondary" onclick="clearCart()">
+                        <i class="fas fa-trash"></i>
+                        Clear Cart
+                    </button>
+                    <button class="btn btn-primary" id="checkout-btn" onclick="checkout()">
+                        <i class="fas fa-credit-card"></i>
+                        Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Material Details</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Product details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Checkout</h3>
+                <button class="modal-close" onclick="closeCheckoutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="company-name">Company Name *</label>
+                        <input type="text" id="company-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-person">Contact Person *</label>
+                        <input type="text" id="contact-person" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="delivery-address">Delivery Address *</label>
+                        <textarea id="delivery-address" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h4>Order Summary</h4>
+                        <div id="checkout-items"></div>
+                        <div class="summary-totals">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="checkout-subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Platform Fee (3%):</span>
+                                <span id="checkout-platform-fee">₹0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="checkout-total">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i>
+                            Place Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script src="buyer.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - GreenScore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo">
+                    <a href="/">
+                        <i class="fas fa-leaf"></i>
+                        <span>GreenScore</span>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="/">Home</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="auth-main">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="showTab('signin')">Sign In</button>
+                    <button class="tab-btn" onclick="showTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Sign In Form -->
+                <div id="signin" class="auth-form active">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to your GreenScore account</p>
+                    
+
+                    
+                    <form id="signin-form">
+                        <div class="form-group">
+                            <label for="signin-email">Email Address</label>
+                            <input type="email" id="signin-email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signin-password">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signin-password" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('signin-password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signin-usertype">Access As</label>
+                            <select id="signin-usertype" required>
+                                <option value="">Select Access Type</option>
+                                <option value="seller">Seller Dashboard</option>
+                                <option value="buyer">Buyer Marketplace</option>
+                                <option value="admin">Admin Panel</option>
+                            </select>
+                            <small style="color: #64748b; font-size: 0.9rem;">You can switch between seller and buyer modes anytime after signing in.</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary full-width">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Sign In
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p><a href="#" onclick="showForgotPassword()">Forgot your password?</a></p>
+                    </div>
+                </div>
+
+                <!-- Sign Up Form -->
+                <div id="signup" class="auth-form">
+                    <h2>Create Account</h2>
+                    <p>Join GreenScore marketplace today</p>
+                    
+
+                    
+                    <form id="signup-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="signup-name">Full Name</label>
+                                <input type="text" id="signup-name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="signup-email">Email Address</label>
+                                <input type="email" id="signup-email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-company">Company Name</label>
+                            <input type="text" id="signup-company" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <div class="password-input">
+                                <input type="password" id="signup-password" required minlength="8">
+                                <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="password-strength"></div>
+                            <small style="color: #64748b;">Minimum 8 characters with letters and numbers</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-usertype">Primary Use</label>
+                            <select id="signup-usertype" required>
+                                <option value="">Select Primary Use</option>
+                                <option value="seller">Primarily Selling Materials</option>
+                                <option value="buyer">Primarily Buying Materials</option>
+                            </select>
+                            <small style="color: #64748b; font-size: 0.9rem;">You'll be able to both buy and sell materials regardless of your selection.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="terms-checkbox" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary full-width">
+                            <i class="fas fa-user-plus"></i>
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Features -->
+            <div class="security-info">
+                <h3><i class="fas fa-shield-alt"></i> Your Security Matters</h3>
+                <div class="security-features">
+                    <div class="security-feature">
+                        <i class="fas fa-lock"></i>
+                        <span>256-bit SSL encryption</span>
+                    </div>
+                    <div class="security-feature">
+                        <i class="fas fa-key"></i>
+                        <span>Secure password hashing</span>
+                    </div>
+                    <div class="security-feature">
+                        <i class="fas fa-database"></i>
+                        <span>Secure data storage</span>
+                    </div>
+                    <div class="security-feature">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Enterprise-grade security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reset Password</h3>
+                <button class="modal-close" onclick="closeForgotPassword()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Enter your email address and we'll send you a link to reset your password.</p>
+                <form id="forgot-password-form">
+                    <div class="form-group">
+                        <label for="forgot-email">Email Address</label>
+                        <input type="email" id="forgot-email" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeForgotPassword()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Reset Link
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="auth.js"></script>
+    
+
+</body>
+</html>

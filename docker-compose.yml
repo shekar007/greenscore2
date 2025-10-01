@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: greenscore-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: greenscore_marketplace
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - greenscore-network
+
+  # Backend Server
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: greenscore-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/greenscore_marketplace?authSource=admin
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    networks:
+      - greenscore-network
+
+  # Frontend Client
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: greenscore-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000/api
+    depends_on:
+      - backend
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - greenscore-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  greenscore-network:
+    driver: bridge

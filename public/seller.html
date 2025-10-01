@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Seller Dashboard - GreenScore</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo">
+                    <a href="/">
+                        <i class="fas fa-leaf"></i>
+                        <span>GreenScore</span>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="#dashboard">Dashboard</a>
+                    <a href="#inventory">Inventory</a>
+                    <a href="#upload">Upload</a>
+                    <a href="/buyer" class="mode-switch">
+                        <i class="fas fa-shopping-cart"></i>
+                        Switch to Buyer
+                    </a>
+                    <a href="#" onclick="signOut()" class="sign-out-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="seller-main">
+        <div class="container">
+            <div class="seller-header">
+                <h1><i class="fas fa-store"></i> Seller Dashboard</h1>
+                <p>Welcome, <span id="seller-name">Seller</span>! Manage your construction materials inventory and reach buyers across the platform</p>
+                
+                <!-- Project Management -->
+                <div class="project-management">
+                    <div class="project-selector">
+                        <label for="current-project">Current Project:</label>
+                        <select id="current-project">
+                            <option value="">Select a project</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="showCreateProjectModal()">
+                            <i class="fas fa-plus"></i>
+                            New Project
+                        </button>
+                        <button class="btn btn-secondary" onclick="manualRefresh()" title="Refresh all data">
+                            <i class="fas fa-sync"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-items">0</h3>
+                        <p>Total Items</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-value">₹0</h3>
+                        <p>Total Inventory Value</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="active-listings">0</h3>
+                        <p>Active Listings</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>B2B</h3>
+                        <p>Market Focus</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seller-content">
+                <div class="content-tabs">
+                    <button class="tab-btn active" onclick="showTab('upload-tab')">
+                        <i class="fas fa-upload"></i> Upload Inventory
+                    </button>
+                    <button class="tab-btn" onclick="showTab('inventory-tab')">
+                        <i class="fas fa-list"></i> My Inventory
+                    </button>
+                    <button class="tab-btn" onclick="showTab('manual-tab')">
+                        <i class="fas fa-plus"></i> Add Single Item
+                    </button>
+                    <button class="tab-btn" onclick="showTab('orders-tab')">
+                        <i class="fas fa-shopping-cart"></i> Order Requests <span id="orders-count" class="notification-badge" style="display: none;"></span>
+                    </button>
+                    <button class="tab-btn" onclick="showTab('history-tab')">
+                        <i class="fas fa-history"></i> Transaction History
+                    </button>
+                    <button class="tab-btn" onclick="showTab('notifications-tab')">
+                        <i class="fas fa-bell"></i> Notifications <span id="notification-count" class="notification-badge" style="display: none;"></span>
+                    </button>
+                </div>
+
+                <!-- CSV Upload Tab -->
+                <div id="upload-tab" class="tab-content active">
+                    <div class="upload-section">
+                        <h2>Bulk Upload Inventory</h2>
+                        <p>Upload your inventory using CSV, Excel, or PDF files. Our system will automatically detect and parse the data.</p>
+                        
+                        <div class="csv-requirements">
+                            <h4><i class="fas fa-info-circle"></i> Smart CSV Processing</h4>
+                            <p>Our system automatically detects and extracts relevant columns from your CSV, Excel, or PDF files. Column names are flexible!</p>
+                            
+                            <ul class="requirements-list">
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Material Name</strong> - Required (material, item, product, name)</li>
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Quantity</strong> - Required (qty, quantity, amount, count)</li>
+                                <li class="required"><i class="fas fa-asterisk"></i> <strong>Price</strong> - Required (price today, current price, selling price, price)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Unit</strong> - Optional (unit, units, measurement, uom)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Brand</strong> - Optional (brand, manufacturer, make)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Condition</strong> - Optional (condition, state, quality)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Specifications</strong> - Optional (specs, specifications, details)</li>
+                                <li class="optional"><i class="fas fa-circle"></i> <strong>Photo</strong> - Optional (photo, image, picture, url)</li>
+                            </ul>
+                            
+                            <p><small><strong>Note:</strong> Missing columns will be filled with default values. Invalid rows will be reported for correction.</small></p>
+                        </div>
+
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h3>Drop your file here</h3>
+                                <p>or <span class="upload-link">click to browse</span></p>
+                                <small>Supports CSV, Excel (.xlsx/.xls), PDF, and ZIP files</small>
+                                <input type="file" id="csv-file" accept=".csv,.xlsx,.xls,.pdf,.zip" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="upload-actions">
+                            <button class="btn btn-primary" id="upload-btn" disabled>
+                                <i class="fas fa-upload"></i>
+                                Upload Inventory
+                            </button>
+                        </div>
+
+                        <div id="upload-progress" class="upload-progress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <p>Processing your inventory...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="inventory-tab" class="tab-content">
+                    <div class="inventory-section">
+                        <div class="inventory-header">
+                            <h2>My Inventory</h2>
+                            <div class="inventory-controls">
+                                <select id="project-filter">
+                                    <option value="all">All Projects</option>
+                                </select>
+                                <select id="category-filter">
+                                    <option value="all">All Categories</option>
+                                </select>
+                                <select id="inventory-type-filter">
+                                    <option value="all">All Types</option>
+                                    <option value="surplus">Surplus</option>
+                                    <option value="manual">Manual Entry</option>
+                                    <option value="returned">Returned</option>
+                                </select>
+                                <select id="listing-type-filter">
+                                    <option value="all">All Listings</option>
+                                    <option value="resale">For Resale</option>
+                                    <option value="internal_transfer">Internal Transfer</option>
+                                    <option value="sold">Sold</option>
+                                </select>
+                                <input type="text" id="search-inventory" placeholder="Search inventory...">
+                                <div class="view-toggle">
+                                    <button class="view-btn active" onclick="setView('grid')" id="grid-view-btn">
+                                        <i class="fas fa-th"></i>
+                                    </button>
+                                    <button class="view-btn" onclick="setView('table')" id="table-view-btn">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="inventory-grid" id="inventory-grid">
+                            <div class="no-inventory">
+                                <i class="fas fa-boxes"></i>
+                                <h3>No inventory found</h3>
+                                <p>Upload your first CSV file or add items manually to get started.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="inventory-table" id="inventory-table" style="display: none;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Material</th>
+                                        <th>Brand</th>
+                                        <th>Category</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Project</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body">
+                                    <!-- Table rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Add Tab -->
+                <div id="manual-tab" class="tab-content">
+                    <div class="manual-add-section">
+                        <h2>Add Single Item</h2>
+                        <form id="manual-item-form" class="item-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="item-material">Material Name *</label>
+                                    <input type="text" id="item-material" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-brand">Brand</label>
+                                    <input type="text" id="item-brand">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-category">Category</label>
+                                    <select id="item-category">
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-qty">Quantity *</label>
+                                    <input type="number" id="item-qty" required min="1">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-unit">Unit</label>
+                                    <input type="text" id="item-unit" placeholder="pcs, sqft, etc.">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-condition">Condition</label>
+                                    <select id="item-condition">
+                                        <option value="new">New</option>
+                                        <option value="like-new">Like New</option>
+                                        <option value="good">Good</option>
+                                        <option value="fair">Fair</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-mrp">MRP (₹)</label>
+                                    <input type="number" id="item-mrp" step="0.01" min="0">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="item-price-today">Selling Price (₹) *</label>
+                                    <input type="number" id="item-price-today" step="0.01" min="0" required>
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label for="item-specs">Specifications</label>
+                                    <textarea id="item-specs" rows="3" placeholder="Detailed specifications..."></textarea>
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label for="item-photos">Photos (Add multiple for slideshow)</label>
+                                    
+                                    <!-- Single Photo Upload Button -->
+                                    <div class="photo-upload-options">
+                                        <button type="button" class="btn btn-primary photo-upload-btn" onclick="triggerPhotoUpload()">
+                                            <i class="fas fa-camera"></i>
+                                            <i class="fas fa-upload"></i>
+                                            <span>Add Photos</span>
+                                        </button>
+                                        <small class="upload-hint">Upload from gallery or take a photo</small>
+                                    </div>
+                                    
+                                    <!-- Combined File Upload Input (hidden) - works for both camera and gallery -->
+                                    <input type="file" id="photo-input" multiple accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoFiles(this)">
+                                    
+                                    <!-- Photo Preview Grid -->
+                                    <div id="photo-preview-grid" class="photo-preview-grid"></div>
+                                    
+                                    <small>On mobile: Choose from gallery or camera. On desktop: Select files to upload.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Add Item
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Order Requests Tab -->
+                <div id="orders-tab" class="tab-content">
+                    <div class="orders-section">
+                        <h2><i class="fas fa-shopping-cart"></i> Order Request Management</h2>
+                        
+                        <!-- Sub-tabs for Requests and History -->
+                        <div class="order-subtabs">
+                            <button class="order-subtab active" onclick="showOrderSubtab('requests')">
+                                <i class="fas fa-clock"></i> Pending Requests
+                            </button>
+                            <button class="order-subtab" onclick="showOrderSubtab('history')">
+                                <i class="fas fa-history"></i> Order History
+                            </button>
+                        </div>
+                        
+                        <!-- Requests Section -->
+                        <div id="order-requests-section" class="order-subtab-content active">
+                            <div class="orders-controls">
+                                <button class="btn btn-secondary" onclick="loadOrderRequests()">
+                                    <i class="fas fa-sync"></i> Refresh Requests
+                                </button>
+                                <div class="filter-group">
+                                    <select id="order-status-filter">
+                                        <option value="pending">Pending Requests</option>
+                                        <option value="approved">Approved Requests</option>
+                                        <option value="declined">Declined Requests</option>
+                                        <option value="all">All Requests</option>
+                                    </select>
+                                    <select id="order-sort-filter">
+                                        <option value="date_desc">Newest First</option>
+                                        <option value="date_asc">Oldest First</option>
+                                        <option value="amount_desc">Highest Amount First</option>
+                                        <option value="amount_asc">Lowest Amount First</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="orders-list" class="orders-list">
+                                <div class="no-orders">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <p>No order requests received</p>
+                                    <small>Order requests from buyers will appear here for your review and approval</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Order History Section -->
+                        <div id="order-history-section" class="order-subtab-content">
+                            <div class="orders-controls">
+                                <button class="btn btn-secondary" onclick="loadOrderHistory()">
+                                    <i class="fas fa-sync"></i> Refresh History
+                                </button>
+                                <button class="btn btn-primary" onclick="exportOrderHistory()">
+                                    <i class="fas fa-download"></i> Export CSV
+                                </button>
+                                <div class="filter-group">
+                                    <select id="history-status-filter">
+                                        <option value="all">All Orders</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="order-history-list" class="orders-list">
+                                <div class="no-orders">
+                                    <i class="fas fa-history"></i>
+                                    <p>No order history</p>
+                                    <small>Completed orders will appear here</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction History Tab -->
+                <div id="history-tab" class="tab-content">
+                    <div class="history-section">
+                        <h2><i class="fas fa-history"></i> Transaction History</h2>
+                        <div class="history-controls">
+                            <button class="btn btn-secondary" onclick="loadTransactionHistory()">
+                                <i class="fas fa-sync"></i> Refresh History
+                            </button>
+                            <button class="btn btn-primary" onclick="exportTransactionHistory()">
+                                <i class="fas fa-download"></i> Export CSV
+                            </button>
+                            <div class="filter-group">
+                                <select id="transaction-type-filter">
+                                    <option value="all">All Transactions</option>
+                                    <option value="sale">Sales</option>
+                                    <option value="internal_transfer">Internal Transfers</option>
+                                    <option value="listing_created">Listings Created</option>
+                                </select>
+                                <input type="date" id="date-from-filter" placeholder="From Date">
+                                <input type="date" id="date-to-filter" placeholder="To Date">
+                            </div>
+                        </div>
+                        <div id="history-list" class="history-list">
+                            <div class="no-history">
+                                <i class="fas fa-history"></i>
+                                <p>No transaction history</p>
+                                <small>Your sales, transfers, and listing activities will appear here</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="notifications-tab" class="tab-content">
+                    <div class="notifications-section">
+                        <h2><i class="fas fa-bell"></i> Transaction Notifications</h2>
+                        <div class="notifications-controls">
+                            <button class="btn btn-secondary" onclick="markAllNotificationsRead()">
+                                <i class="fas fa-check-double"></i> Mark All Read
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearAllNotifications()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                        <div id="notifications-list" class="notifications-list">
+                            <div class="no-notifications">
+                                <i class="fas fa-bell-slash"></i>
+                                <p>No notifications</p>
+                                <small>Sales notifications will appear here when buyers purchase your items</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Project Creation Modal -->
+    <div id="project-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Project</h3>
+                <button class="modal-close" onclick="closeProjectModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="project-form">
+                    <div class="form-group">
+                        <label for="project-name">Project Name *</label>
+                        <input type="text" id="project-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project-location">Location</label>
+                        <input type="text" id="project-location">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project-description">Description</label>
+                        <textarea id="project-description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Create Project
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listing Action Modal -->
+    <div id="listing-action-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Listing Status</h3>
+                <button class="modal-close" onclick="closeListingActionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="listing-action-form">
+                    <input type="hidden" id="action-material-id">
+                    
+                    <div class="form-group">
+                        <label for="listing-type">Listing Type</label>
+                        <select id="listing-type" required>
+                            <option value="resale">For Resale (Visible to buyers)</option>
+                            <option value="internal_transfer">Internal Transfer</option>
+                            <option value="sold">Mark as Sold</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="target-project-group" style="display: none;">
+                        <label for="target-project">Target Project</label>
+                        <select id="target-project">
+                            <option value="">Select project</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="transfer-quantity-group" style="display: none;">
+                        <label for="transfer-quantity">Quantity to Transfer</label>
+                        <input type="number" id="transfer-quantity" min="1" placeholder="Enter quantity">
+                        <small id="available-quantity" class="form-help"></small>
+                    </div>
+                    
+                    <div class="form-group" id="transfer-notes-group" style="display: none;">
+                        <label for="transfer-notes">Transfer Notes (Optional)</label>
+                        <textarea id="transfer-notes" rows="3" placeholder="Add any notes about this transfer..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeListingActionModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Update Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bid Review Modal -->
+    <div id="bid-review-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Review Bid</h3>
+                <button class="modal-close" onclick="closeBidReviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="bid-details">
+                    <!-- Bid details will be populated here -->
+                </div>
+                <form id="bid-review-form">
+                    <input type="hidden" id="review-bid-id">
+                    
+                    <div class="form-group">
+                        <label for="bid-seller-notes">Notes to Buyer (Optional)</label>
+                        <textarea id="bid-seller-notes" rows="3" placeholder="Add any notes for the buyer..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-danger" onclick="declineBid()">
+                            <i class="fas fa-times"></i>
+                            Decline Bid
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="approveBid()">
+                            <i class="fas fa-check"></i>
+                            Approve Bid
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Material Requests Modal -->
+    <div id="material-bids-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Order Requests for Material</h3>
+                <button class="modal-close" onclick="closeMaterialRequestsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="material-info">
+                    <!-- Material info will be populated here -->
+                </div>
+                <div id="material-bids-list">
+                    <!-- Bids list will be populated here -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-success" onclick="approveMaxBid()" id="approve-max-bid-btn" style="display: none;">
+                        <i class="fas fa-trophy"></i>
+                        Approve Highest Bid
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Material Modal -->
+    <div id="edit-material-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Material</h3>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-material-form">
+                    <input type="hidden" id="edit-material-id">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-material-name">Material Name *</label>
+                            <input type="text" id="edit-material-name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-brand">Brand</label>
+                            <input type="text" id="edit-brand">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-category">Category</label>
+                            <select id="edit-category">
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-qty">Quantity *</label>
+                            <input type="number" id="edit-qty" required min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-unit">Unit</label>
+                            <input type="text" id="edit-unit" placeholder="pcs, sqft, etc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-condition">Condition</label>
+                            <select id="edit-condition">
+                                <option value="new">New</option>
+                                <option value="like-new">Like New</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-mrp">MRP (₹)</label>
+                            <input type="number" id="edit-mrp" step="0.01" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-price-today">Selling Price (₹) *</label>
+                            <input type="number" id="edit-price-today" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="edit-specs">Specifications</label>
+                            <textarea id="edit-specs" rows="3" placeholder="Detailed specifications..."></textarea>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="edit-photo">Photo URL</label>
+                            <input type="text" id="edit-photo" placeholder="Image URL (optional)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="edit-lock-warning" style="display: none; padding: 20px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin-top: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; color: #dc2626;">
+                        <i class="fas fa-lock" style="font-size: 24px;"></i>
+                        <div>
+                            <strong>This item is currently being edited</strong>
+                            <p style="margin: 4px 0 0 0; color: #7f1d1d;">Another user is editing this material. Please wait for them to finish or try again later.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script src="seller-enhanced.js"></script>
+    <script>
+        // Ensure modal functions are available immediately
+        window.showCreateProjectModal = window.showCreateProjectModal || function() {
+            document.getElementById('project-modal').classList.add('show');
+        };
+        
+        window.closeProjectModal = window.closeProjectModal || function() {
+            document.getElementById('project-modal').classList.remove('show');
+            document.getElementById('project-form').reset();
+        };
+        
+        window.closeMaterialRequestsModal = window.closeMaterialRequestsModal || function() {
+            document.getElementById('material-bids-modal').classList.remove('show');
+        };
+    </script>
+</body>
+</html>
