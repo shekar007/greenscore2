@@ -40,8 +40,8 @@
   ],
   "author": "GreenScore Team",
   "license": "MIT"
-}
 "scripts": {
   "start": "node index.js",
   "postinstall": "npm rebuild sqlite3 --build-from-source"
+}
 }
